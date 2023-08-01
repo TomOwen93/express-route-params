@@ -8,47 +8,35 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/eat/apple", (req, res) => {
-  res.json({
-    message: "Yum yum - you ate an apple!",
-  });
-});
+app.get<{ exampleRouteParameter: string }>(
+  "/echo/:exampleRouteParameter",
+  (req, res) => {
+    const echoContent = req.params.exampleRouteParameter;
+    res.json({
+      echo: echoContent,
+      message: `I am echoing back to you: ${echoContent}`,
+    });
+  }
+);
 
-app.get("/eat/banana", (req, res) => {
-  res.json({
-    message: "Yum yum - you ate a banana!",
-  });
-});
-
-app.get("/eat/carrot", (req, res) => {
-  res.json({
-    message: "Yum yum - you ate a carrot!",
-  });
-});
-
-app.get("/echo/:exampleRouteParameter", (req, res) => {
-  const echoContent = req.params.exampleRouteParameter;
-  res.json({
-    echo: echoContent,
-    message: `I am echoing back to you: ${echoContent}`,
-  });
-});
-
-app.get("/multiply/:numOne/:numTwo", (req, res) => {
-  /**
-   * Note that `numOne` and `numTwo` are both typed as string.
-   * (Hover over with your mouse to see!)
-   *
-   * Route params are, by default, typed as strings when they
-   * are parsed by Express.
-   */
-  const { numOne, numTwo } = req.params;
-  const multiplication = parseInt(numOne) * parseInt(numTwo);
-  res.json({
-    original: `${numOne} x ${numTwo}`,
-    result: multiplication,
-  });
-});
+app.get<{ numOne: string; numTwo: string }>(
+  "/multiply/:numOne/:numTwo",
+  (req, res) => {
+    /**
+     * Note that `numOne` and `numTwo` are both typed as string.
+     * (Hover over with your mouse to see!)
+     *
+     * Route params are, by default, typed as strings when they
+     * are parsed by Express.
+     */
+    const { numOne, numTwo } = req.params;
+    const multiplication = parseInt(numOne) * parseInt(numTwo);
+    res.json({
+      original: `${numOne} x ${numTwo}`,
+      result: multiplication,
+    });
+  }
+);
 
 /**
  * `app.get` can take a type argument.
@@ -68,6 +56,60 @@ app.get<{ name: string }>("/happy-birthday/:name", (req, res) => {
       `Happy birthday dear ${req.params.name}`,
       "Happy birthday to you!",
     ],
+  });
+});
+
+app.get<{ shoutedText: string }>("/shout/:shoutedText", (req, res) => {
+  const shoutedText = req.params.shoutedText;
+  res.json({
+    shout: `${shoutedText}`,
+    result: `I am shouting back to you: ${shoutedText}!`,
+  });
+});
+
+//GET /add/3/4 should have a JSON body response of { "original": "3 + 4", "result": 7 }
+
+app.get<{ number1: string; number2: string }>(
+  "/add/:number1/:number2",
+  (req, res) => {
+    const number1 = parseInt(req.params.number1);
+    const number2 = parseInt(req.params.number2);
+
+    const result = number1 + number2;
+    res.json({ original: `${number1}+${number2}`, result: result });
+  }
+);
+
+app.get<{ number1: string; number2: string; number3: string }>(
+  "/add/:number1/:number2/:number3",
+  (req, res) => {
+    const number1 = parseInt(req.params.number1);
+    const number2 = parseInt(req.params.number2);
+    const number3 = parseInt(req.params.number3);
+
+    const result = number1 + number2 + number3;
+    res.json({ original: `${number1}+${number2}+${number3}`, result: result });
+  }
+);
+
+let vowels = ["a", "e", "i", "o", "u"];
+
+function anVsAn(food: string): string {
+  let result = "";
+
+  if (vowels.includes(food[0])) {
+    result = "an";
+  } else {
+    result = "a";
+  }
+
+  return result;
+}
+
+app.get<{ food: string }>("/eat/:food", (req, res) => {
+  const food = req.params.food;
+  res.json({
+    message: `Yum yum - you ate ${anVsAn(food)} ${food}!`,
   });
 });
 
